@@ -1,0 +1,157 @@
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+  <title>DiCache</title>
+  <link rel="stylesheet" href="./FreeScale_files/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./FreeScale_files/css/dics.min.css">
+  <link rel="stylesheet" href="./FreeScale_files/css/bulma.min.css">
+  <link rel="stylesheet" href="./FreeScale_files/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./FreeScale_files/css/index.css">
+  <link rel="stylesheet" href="./FreeScale_files/css/style.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="./FreeScale_files/js/bulma-carousel.min.js"></script>
+  <script src="./FreeScale_files/js/index.js"></script>
+  <script src="./FreeScale_files/js/dics.min.js"></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', domReady);
+      function domReady() {
+          for (const e of document.querySelectorAll(".b-dics")) {
+              new Dics({
+                  container: e,
+                  textPosition: "top"
+              });
+          }
+      }
+  </script>
+  </head>
+  
+  <div class="content">
+    <h1><strong><font color="#e17055">🚀DiCache</font>: Let Diffusion Model Determine Its Own Cache</strong></h1>
+    <!-- <p style="text-align: center; font-weight: bold; font-size: 1.2em">2025</p> -->
+    <p id="authors"><a href="https://bujiazi.github.io/"><b>Jiazi Bu<sup>1,5*</sup></b></a> 
+                    <a href="https://github.com/LPengYang/"><b>Pengyang Ling<sup>2,5*</sup></b></a> 
+                    <a href="https://github.com/YujieOuO"><b>Yujie Zhou<sup>1,5*</sup></b></a> 
+                    <a href="https://codegoat24.github.io/"><b>Yibin Wang<sup>3,6</sup></b></a></p> 
+    <p id="authors"><a href="https://yuhangzang.github.io/"><b>Yuhang Zang<sup>5</sup></b></a>
+                    <a href="http://dahua.site/"><b>Dahua Lin<sup>4,5,7</sup></b></a> 
+                    <a href="https://myownskyw7.github.io/"><b>Jiaqi Wang<sup>5,6†</sup></b></a><br>
+    <br>
+    <span style="font-size: 16px"><b><sup>1</sup> Shanghai Jiao Tong University</b> &nbsp;&nbsp; <b><sup>2</sup> University of Science and Technology of China</b> &nbsp;&nbsp; <b><sup>3</sup> Fudan University</b>   
+    </span>
+    <br>
+    <span style="font-size: 16px"><span style="font-size: 16px"><b><sup>4</sup> The Chinese University of Hong Kong</b> &nbsp;&nbsp; <b><sup>5</sup> Shanghai Artificial Intelligence Laboratory</b>
+    </span>
+    <br>
+    <span style="font-size: 16px"><b><sup>6</sup> Shanghai Innovation Institute</b> &nbsp;&nbsp; <b><sup>7</sup> CPII under InnoHK</b>
+    </span>
+    <br>
+    <span style="font-size: 16px"><b>(<sup>*</sup> Equal Contribution &nbsp; <sup>†</sup> Corresponding Author)</b>
+    </span></p>
+    <font size="+2">
+      <p style="text-align: center;">
+        <a href="https://arxiv.org/abs/2508.17356" target="_blank"><b>[Paper]</b></a> &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://github.com/Bujiazi/DiCache" target="_blank"><b>[Code]</b></a>
+      </p>
+    </font>
+    <br>
+    <img width="960" src="./FreeScale_files/figs/fig_teaser.png">
+  </div>
+  
+  <div class="container" id="main">
+    <div class="content">
+      <h2 style="text-align:center;"><b>Demo Video for DiCache</b></h2>
+      <video muted loop playsinline controls dth="1024px">
+        <source src="./FreeScale_files/vids/dicache_demo_video.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <div class="content">
+    <h2 style="text-align:center;"><b>Abstract</b></h2>
+    <p>Recent years have witnessed the rapid development of acceleration techniques for diffusion models, especially caching-based acceleration methods. These studies seek to answer two fundamental questions: "When to cache" and "How to use cache", typically relying on predefined empirical laws or dataset-level priors to determine caching timings and adopting handcrafted rules for multi-step cache utilization. However, given the highly dynamic nature of the diffusion process, they often exhibit limited generalizability and fail to cope with diverse samples. In this paper, a strong sample-specific correlation is revealed between the variation patterns of the shallow-layer feature differences in the diffusion model and those of deep-layer features. Moreover, we have observed that the features from different model layers form similar trajectories. Based on these observations, we present <b>DiCache</b>, a novel training-free adaptive caching strategy for accelerating diffusion models at runtime, answering both when and how to cache within a unified framework. Specifically, DiCache is composed of two principal components: (1) Online Probe Profiling Scheme leverages a shallow-layer online probe to obtain an on-the-fly indicator for the caching error in real time, enabling the model to dynamically customize the caching schedule for each sample. (2) Dynamic Cache Trajectory Alignment adaptively approximates the deep-layer feature output from multi-step historical caches based on the shallow-layer feature trajectory, facilitating higher visual quality. Extensive experiments validate DiCache's capability in achieving higher efficiency and improved fidelity over state-of-the-art approaches on various leading diffusion models including WAN 2.1, HunyuanVideo and Flux. Our code is available at <a href="https://github.com/Bujiazi/DiCache">DiCache Repo</a>.</p>
+  </div>
+
+  <div class="content">
+    <h2><b>Observation and Motivation</b></h2>
+    <p>
+    (1) <b>For a given sampling process, the difference in shallow-layer features strongly correlates with that in deep-layer features on a sample-specific basis</b>, enabling them to serve as an on-the-fly proxy for the final model output evolution.</p>
+    <div style="text-align: center;">
+    <img width="960" src="./FreeScale_files/figs/fig_observation1.png">
+  </div>
+    <br>
+    (2) <b>The features from different DiT blocks form similar trajectories</b>, which allows for dynamically extrapolating the deep-layer feature output through combining multi-step historical caches based on the shallow-layer probe feature trajectory.
+    <div style="text-align: center;">
+    <img width="960" src="./FreeScale_files/figs/fig_observation2.png">
+  </div>
+  </div>
+  
+  <div class="content">
+    <h2><b>Methodology</b></h2>
+    <p>DiCache consists of Online Probe Profiling Strategy and Dynamic Cache Trajectory Alignment. The former dynamically determines the caching timing with an online shallow-layer probe at runtime, while the latter combines multi-step caches based on the probe feature trajectory to adaptively approximate the feature at the current timestep. By integrating the above two techniques, DiCache intrinsically answers when and how to cache in a unified framework.</p>
+    <div style="text-align: center;">
+    <img width="960" src="./FreeScale_files/figs/fig_framework.png">
+    </div>
+  </div>
+  
+  <div class="content">
+    <h2><b>Qualitative Comparison</b></h2>
+    <p>Qualitative comparisons with existing caching-based methods. DiCache consistently outperforms the baselines in terms of both visual quality and similarity to the original results across diverse scenarios and generation backbones.</p>
+    <div style="text-align: center;">
+    <img width="960" src="./FreeScale_files/figs/fig_img_compare.png">
+    </div>
+  </div>
+  
+  <div class="content">
+    <h2><b>Quantitative Evaluation</b></h2>
+    <p>Quantitative assessments of the proposed DiCache and other baselines. Unlike existing methods, DiCache dynamically determines its caching timings and effectively utilizes multi-step caches based on online probes, achieving a unification of rapid inference speed and high visual fidelity. "OOM" indicates CUDA out of memory on the A800 80GB GPU.</p>
+    <div style="text-align: center;">
+    <img width="960" src="./FreeScale_files/figs/fig_quantitative.png">
+    </div>
+  </div>
+  
+  
+  <div class="content">
+  <h2>BibTex</h2>
+  <p>
+      If you find this work helpful, please cite the following paper:
+  </p>
+  <div class="row">
+  <pre>
+    @article{bu2025dicache,
+      title={DiCache: Let Diffusion Model Determine Its Own Cache},
+      author={Bu, Jiazi and Ling, Pengyang and Zhou, Yujie and Wang, Yibin and Zang, Yuhang and Wu, Tong and Lin, Dahua and Wang, Jiaqi},
+      journal={arXiv preprint arXiv:2508.17356},
+      year={2025}
+    }
+  </pre>
+  </div>
+  </div>
+
+  <div class="content">
+    <p>Project page template is borrowed from <a href="http://haonanqiu.com/projects/FreeScale.html">FreeScale</a>.</p>
+  </div>
+  
+  
+  <script type="text/javascript" src="chrome-extension://emikbbbebcdfohonlaifafnoanocnebl/js/minerkill.js"></script></body><grammarly-desktop-integration data-grammarly-shadow-root="true"><template shadowrootmode="open"><style>
+    div.grammarly-desktop-integration {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select:none;
+      user-select:none;
+    }
+  
+    div.grammarly-desktop-integration:before {
+      content: attr(data-content);
+    }
+  </style><div aria-label="grammarly-integration" role="group" tabindex="-1" class="grammarly-desktop-integration" data-content="{&quot;mode&quot;:&quot;full&quot;,&quot;isActive&quot;:true,&quot;isUserDisabled&quot;:false}"></div></template></grammarly-desktop-integration>
+  </html>
+  
